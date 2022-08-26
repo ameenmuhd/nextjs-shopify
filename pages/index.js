@@ -16,9 +16,11 @@ import {
   TextStyle,
   TextContainer,
   DisplayText,
+  Text,
 } from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import jsPDF from "jspdf";
+import { DropdownMinor } from "@shopify/polaris-icons";
 
 export default function Home({ products }) {
   const [category, setCategory] = useState(null);
@@ -37,7 +39,7 @@ export default function Home({ products }) {
   const pdfGenerate = (product) => {
     var doc = new jsPDF("portrait");
     doc.setFont("helvetica", "bold");
-    doc.text(product.title, 30, 20, { maxWidth: 150 }, "center");
+    doc.text(product.title, 20, 20, { maxWidth: 150 });
     doc.addImage(product.image, "JPEG", 55, 40, 100, 100);
     doc.setFontSize(22);
     doc.text("Description", 20, 160);
@@ -51,7 +53,7 @@ export default function Home({ products }) {
     doc.setFontSize(16);
     doc.text("Rating:" + product.rating.rate, 20, 210);
     doc.text("Rated by:" + product.rating.count, 20, 220);
-    doc.save(product.id+".pdf");
+    doc.save(product.id + ".pdf");
   };
 
   useEffect(() => {
@@ -250,7 +252,17 @@ export default function Home({ products }) {
 
   return (
     <AppProvider i18n={enTranslations}>
-      <Page singleColumn title="Products" >
+      <Page
+        title="Products"
+        primaryAction={{
+          content: "Add Product",
+        }}
+        secondaryActions={[
+          { content: "Export" },
+          { content: "Import" },
+          { content: "More Options", icon: DropdownMinor },
+        ]}
+      >
         <Layout>
           <Layout.Section>
             <Card>
@@ -268,13 +280,55 @@ export default function Home({ products }) {
                 itemCount={rows.length}
                 selectable={false}
                 headings={[
-                  { title: "Id" },
-                  { title: "Image" },
-                  { title: "Product" },
-                  { title: "Category" },
-                  { title: "Price" },
-                  { title: "Rating" },
-                  { title: "Description" },
+                  {
+                    title: (
+                      <Text variant="headingSm" as="h6">
+                        Id
+                      </Text>
+                    ),
+                  },
+                  {
+                    title: (
+                      <Text variant="headingSm" as="h6">
+                        Image
+                      </Text>
+                    ),
+                  },
+                  {
+                    title: (
+                      <Text variant="headingSm" as="h6">
+                        Product
+                      </Text>
+                    ),
+                  },
+                  {
+                    title: (
+                      <Text variant="headingSm" as="h6">
+                        Category
+                      </Text>
+                    ),
+                  },
+                  {
+                    title: (
+                      <Text variant="headingSm" as="h6">
+                        Price
+                      </Text>
+                    ),
+                  },
+                  {
+                    title: (
+                      <Text variant="headingSm" as="h6">
+                        Rating
+                      </Text>
+                    ),
+                  },
+                  {
+                    title: (
+                      <Text variant="headingSm" as="h6">
+                        Description
+                      </Text>
+                    ),
+                  },
                 ]}
               >
                 {rows}
