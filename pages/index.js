@@ -250,7 +250,7 @@ export default function Home({ products }) {
 
   return (
     <AppProvider i18n={enTranslations}>
-      <Page singleColumn title="Products List" >
+      <Page singleColumn title="Products" >
         <Layout>
           <Layout.Section>
             <Card>
