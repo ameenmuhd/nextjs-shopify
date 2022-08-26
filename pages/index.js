@@ -18,6 +18,7 @@ import {
   DisplayText,
 } from "@shopify/polaris";
 import { useState, useCallback } from "react";
+import jsPDF from "jspdf";
 
 export default function Home({ products }) {
   const [category, setCategory] = useState(null);
@@ -32,6 +33,26 @@ export default function Home({ products }) {
     setActive(!active), [active];
     setSelectedProduct(product);
   });
+
+  const pdfGenerate = (product) => {
+    var doc = new jsPDF("portrait");
+    doc.setFont("helvetica", "bold");
+    doc.text(product.title, 30, 20, { maxWidth: 150 }, "center");
+    doc.addImage(product.image, "JPEG", 55, 40, 100, 100);
+    doc.setFontSize(22);
+    doc.text("Description", 20, 160);
+    doc.setFont("times", "normal");
+    doc.setFontSize(13);
+    doc.text(product.description, 20, 170, { maxWidth: 170 });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("Rating:", 20, 200);
+    doc.setFont("times", "normal");
+    doc.setFontSize(16);
+    doc.text("Rating:" + product.rating.rate, 20, 210);
+    doc.text("Rated by:" + product.rating.count, 20, 220);
+    doc.save(product.id+".pdf");
+  };
 
   useEffect(() => {
     const categoryProducts = [];
@@ -57,20 +78,25 @@ export default function Home({ products }) {
               <IndexTable.Cell>
                 <Thumbnail
                   source={product.image}
-                  alt={limit(product.title)}
+                  alt={limit(product.title, 10)}
                   size="small"
                 />
               </IndexTable.Cell>
-              <IndexTable.Cell>{limit(product.title, 20)}</IndexTable.Cell>
+              <IndexTable.Cell>{limit(product.title, 10)}</IndexTable.Cell>
               <IndexTable.Cell>{product.category}</IndexTable.Cell>
               <IndexTable.Cell>{product.price}</IndexTable.Cell>
               <IndexTable.Cell>{product.rating.rate}</IndexTable.Cell>
               <IndexTable.Cell>
-                {limit(product.description, 20)}
+                {limit(product.description, 10)}
               </IndexTable.Cell>
               <IndexTable.Cell>
                 <Button primary onClick={() => handleChange(product)}>
                   View
+                </Button>
+              </IndexTable.Cell>
+              <IndexTable.Cell>
+                <Button onClick={() => handleChange(product)}>
+                  Download pdf
                 </Button>
               </IndexTable.Cell>
             </IndexTable.Row>
@@ -85,19 +111,22 @@ export default function Home({ products }) {
             <IndexTable.Cell>
               <Thumbnail
                 source={product.image}
-                alt={limit(product.title)}
+                alt={limit(product.title, 10)}
                 size="small"
               />
             </IndexTable.Cell>
-            <IndexTable.Cell>{limit(product.title, 20)}</IndexTable.Cell>
+            <IndexTable.Cell>{limit(product.title, 10)}</IndexTable.Cell>
             <IndexTable.Cell>{product.category}</IndexTable.Cell>
             <IndexTable.Cell>{product.price}</IndexTable.Cell>
             <IndexTable.Cell>{product.rating.rate}</IndexTable.Cell>
-            <IndexTable.Cell>{limit(product.description, 20)}</IndexTable.Cell>
+            <IndexTable.Cell>{limit(product.description, 10)}</IndexTable.Cell>
             <IndexTable.Cell>
               <Button primary onClick={() => handleChange(product)}>
                 View
               </Button>
+            </IndexTable.Cell>
+            <IndexTable.Cell>
+              <Button onClick={() => pdfGenerate(product)}>Download pdf</Button>
             </IndexTable.Cell>
           </IndexTable.Row>
         );
@@ -122,7 +151,7 @@ export default function Home({ products }) {
   const handleCategoryRemove = useCallback(() => setCategory(null), []);
   const handleProductTypeRemove = useCallback(() => setProductType(null), []);
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
-  const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
+  const handleQueryValueRemove = useCallback(() => setQueryValue(""), []);
   const handleFiltersClearAll = useCallback(() => {
     handleCategoryRemove();
     handleProductTypeRemove();
@@ -221,10 +250,10 @@ export default function Home({ products }) {
 
   return (
     <AppProvider i18n={enTranslations}>
-      <Page singleColumn title="Products List">
+      <Page singleColumn title="Products List" >
         <Layout>
           <Layout.Section>
-            <Card sectioned>
+            <Card>
               <Card.Section>
                 <Filters
                   queryValue={queryValue}
